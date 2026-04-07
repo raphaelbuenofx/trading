@@ -90,7 +90,23 @@ MARKET_STREAM_PORT=4500 npx tsx backend/src/api/start-stream.ts
 NEXT_PUBLIC_STREAM_PORT=4500 npm run dev
 ```
 
-Abrir en navegador: `http://localhost:3000`.
+Abrir en navegador: `http://localhost:3003`.
+
+## UI premium AI terminal
+
+El frontend fue rediseñado como terminal AI local-first:
+
+- Sidebar con navegación (Dashboard, Markets, Signals, Watchlist, Reports, Settings).
+- Header de estado con sesiones de mercado y resumen de tono AI.
+- Tarjetas enriquecidas por activo con:
+  - señal (`Alcista` / `Bajista` / `Neutral`)
+  - confianza (%)
+  - explicación breve en español
+  - 1-3 frases de análisis técnico AI-style
+- Paneles de apoyo: Featured Signals, Market Brief, Capital Flow Snapshot.
+- Modal de detalle por activo al hacer click.
+
+El motor de señal es local y rule-based (sin APIs pagas obligatorias), evaluando momentum, tendencia de medias, RSI y volatilidad.
 
 ## Flujo de datos por proveedor
 

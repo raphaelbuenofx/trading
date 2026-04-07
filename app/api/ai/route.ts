@@ -1,11 +1,13 @@
 export async function POST(req: Request) {
   try {
     const { price } = await req.json();
+    const endpoint = process.env.OLLAMA_ENDPOINT ?? 'http://localhost:11434/api/generate';
+    const model = process.env.OLLAMA_MODEL ?? 'llama3';
 
-    const response = await fetch("http://localhost:11434/api/generate", {
-      method: "POST",
+    const response = await fetch(endpoint, {
+      method: 'POST',
       body: JSON.stringify({
-        model: "llama3",
+        model,
         prompt: `Eres un analista financiero profesional.
 
 Analiza el precio y da una opinión realista.
@@ -28,55 +30,44 @@ Precio actual: ${price}`,
       }),
     });
 
-    const data = await response.json();
-console.log("RAW IA:", data.response);
-    let parsed;
+    const data = (await response.json()) as { response?: string };
+    const raw = data.response ?? '';
+
+    let parsed: { sentiment?: string; reason?: string; confidence?: number } | null = null;
 
     try {
-      parsed = JSON.parse(data.response);
+      parsed = JSON.parse(raw);
     } catch {
-      // 👇 fallback SIEMPRE SEGURO
+      const match = raw.match(/\{[\s\S]*\}/);
+      if (match) {
+        try {
+          parsed = JSON.parse(match[0]);
+        } catch {
+          parsed = null;
+        }
+      }
+    }
+
+    if (!parsed) {
       parsed = {
-        sentiment: "Neutral",
-        reason: String(data.response),
+        sentiment: 'Neutral',
+        reason: raw || 'Respuesta no estructurada del modelo local',
         confidence: 50,
       };
     }
-    
-try {
-  parsed = JSON.parse(data.response);
-} catch {
-  const match = data.response.match(/\{[\s\S]*\}/);
 
-  if (match) {
-    try {
-      parsed = JSON.parse(match[0]);
-    } catch {
-      parsed = null;
-    }
-  }
-}
-
-if (!parsed) {
-  parsed = {
-    sentiment: "Neutral",
-    reason: String(data.response),
-    confidence: 50,
-  };
-}
-
-return Response.json({
-  data: {
-    sentiment: parsed.sentiment || parsed.Sentiment || "Neutral",
-    reason: parsed.reason || parsed.Reason || "No reason",
-    confidence: parsed.confidence || parsed.Confidence || 50,
-  },
-});
-  } catch (error) {
     return Response.json({
       data: {
-        sentiment: "Neutral",
-        reason: "Error IA",
+        sentiment: parsed.sentiment ?? 'Neutral',
+        reason: parsed.reason ?? 'No reason',
+        confidence: parsed.confidence ?? 50,
+      },
+    });
+  } catch {
+    return Response.json({
+      data: {
+        sentiment: 'Neutral',
+        reason: 'Error IA',
         confidence: 50,
       },
     });
