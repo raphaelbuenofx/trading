@@ -92,3 +92,32 @@ export interface AssetCatalogItem {
   providerSymbol: string;
   supportsStreaming: boolean;
 }
+
+export interface StreamAssetUpdate {
+  type: 'assetUpdate';
+  symbol: string;
+  category: string;
+  provider: string;
+  providerSymbol: string;
+  price: number;
+  volume?: number;
+  timestamp: string;
+}
+
+export interface StreamProviderState {
+  type: 'providerState';
+  provider: string;
+  state: ProviderState;
+  message?: string | null;
+  latencyMs?: number;
+  timestamp: string;
+}
+
+export interface StreamSystemEvent {
+  type: 'system';
+  status: 'connected';
+  message: string;
+  timestamp: string;
+}
+
+export type MarketStreamEvent = StreamAssetUpdate | StreamProviderState | StreamSystemEvent;
