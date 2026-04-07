@@ -34,18 +34,18 @@ export function getProviderMappedAssets(
     return assets
       .filter((asset) => asset.enabled)
       .map((asset) => {
-        const provider =
-          preferredProvider && asset.providers[preferredProvider]
-            ? preferredProvider
-            : Object.keys(asset.providers)[0];
+        const providers = asset.providers as Record<string, string>;
+        const streaming = asset.streaming as Record<string, boolean>;
+
+        const provider = preferredProvider && providers[preferredProvider] ? preferredProvider : Object.keys(providers)[0];
 
         return {
           symbol: asset.symbol,
           name: asset.name,
           category,
           provider,
-          providerSymbol: asset.providers[provider],
-          supportsStreaming: Boolean(asset.streaming[provider]),
+          providerSymbol: providers[provider],
+          supportsStreaming: Boolean(streaming[provider]),
         };
       });
   });
