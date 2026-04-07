@@ -1,3 +1,3 @@
-export default function AssetDetailPage() {
-  return <div>Asset detail (candles, indicators and signal explanation)</div>;
+export default function AssetDetailIndexPage() {
+  return <div>Usa la ruta /asset/&lt;symbol&gt; para ver el detalle con chart e indicadores.</div>;
 }

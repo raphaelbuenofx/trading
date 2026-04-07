@@ -121,3 +121,32 @@ export interface StreamSystemEvent {
 }
 
 export type MarketStreamEvent = StreamAssetUpdate | StreamProviderState | StreamSystemEvent;
+
+
+export type Timeframe = '1H' | '4H' | '1D' | '1W' | '1M';
+
+export interface SourceDataStatus {
+  history: boolean;
+  indicators: boolean;
+  signals: boolean;
+  missingSources: string[];
+  message: string | null;
+}
+
+export interface AssetHistoryResponse {
+  symbol: string;
+  timeframe: Timeframe;
+  candles: Candle[];
+  indicators: IndicatorSet | null;
+  signal: SignalResult | null;
+  sourceStatus: SourceDataStatus;
+}
+
+export interface AssetSignalHistoryEntry {
+  generatedAt: string;
+  direction: SignalDirection;
+  strength: SignalStrength;
+  score: number;
+  confidence: number;
+  reasons: string[];
+}
