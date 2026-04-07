@@ -1,7 +1,9 @@
-import { createServer, type IncomingMessage } from 'node:http';
+import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import type { Duplex } from 'node:stream';
 import { createHash } from 'node:crypto';
 import { MarketHub, type MarketHubProviderState, type MarketHubUpdate } from '@/backend/src/market/MarketHub';
+import { getProviderMappedAssets } from '@/backend/src/providers';
+import { getAssetHistory, getAssetSignalHistory, normalizeTimeframe } from '@/backend/src/api/assetsHistory';
 
 export interface StreamServerOptions {
   port?: number;
@@ -14,7 +16,53 @@ export function startStreamServer(options: StreamServerOptions = {}) {
   const port = options.port ?? Number(process.env.MARKET_STREAM_PORT ?? 4500);
   const clients = new Set<Duplex>();
 
-  const server = createServer();
+  const server = createServer((request, response) => {
+    if (request.method !== 'GET') {
+      sendJson(response, 405, { error: 'Method not allowed' });
+      return;
+    }
+
+    const requestUrl = new URL(request.url ?? '/', `http://${request.headers.host ?? `localhost:${port}`}`);
+
+    if (requestUrl.pathname === '/assets') {
+      sendJson(response, 200, { assets: getProviderMappedAssets() });
+      return;
+    }
+
+    const historyMatch = requestUrl.pathname.match(/^\/assets\/([^/]+)\/history$/);
+    if (historyMatch) {
+      const timeframe = normalizeTimeframe(requestUrl.searchParams.get('timeframe'));
+      const history = getAssetHistory(historyMatch[1], timeframe);
+
+      if (!history) {
+        sendJson(response, 404, { error: 'Asset not found' });
+        return;
+      }
+
+      sendJson(response, 200, history);
+      return;
+    }
+
+    const signalHistoryMatch = requestUrl.pathname.match(/^\/assets\/([^/]+)\/signals\/history$/);
+    if (signalHistoryMatch) {
+      const limit = Number(requestUrl.searchParams.get('limit') ?? '20');
+      const signals = getAssetSignalHistory(signalHistoryMatch[1], Number.isNaN(limit) ? 20 : limit);
+
+      if (!signals) {
+        sendJson(response, 404, { error: 'Asset not found or no signals available' });
+        return;
+      }
+
+      sendJson(response, 200, {
+        symbol: decodeURIComponent(signalHistoryMatch[1]),
+        count: signals.length,
+        items: signals,
+      });
+      return;
+    }
+
+    sendJson(response, 404, { error: 'Not found' });
+  });
   const hub = new MarketHub({
     pollingIntervalByCategory: options.pollingIntervalByCategory,
   });
@@ -75,7 +123,7 @@ export function startStreamServer(options: StreamServerOptions = {}) {
   hub.start();
 
   server.listen(port, () => {
-      console.log(`Market stream available at ws://localhost:${port}/stream`);
+    console.log(`Market stream available at ws://localhost:${port}/stream`);
   });
 
   return {
@@ -126,6 +174,14 @@ function encodeTextFrame(message: string) {
 
 function isCloseFrame(buffer: Buffer) {
   return buffer.length > 0 && (buffer[0] & 0x0f) === 0x08;
+}
+
+function sendJson(response: ServerResponse, statusCode: number, payload: unknown) {
+  response.writeHead(statusCode, {
+    'Content-Type': 'application/json; charset=utf-8',
+    'Access-Control-Allow-Origin': '*',
+  });
+  response.end(JSON.stringify(payload));
 }
 
 export function isWebSocketUpgrade(request: IncomingMessage) {
