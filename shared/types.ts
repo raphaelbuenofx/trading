@@ -83,3 +83,12 @@ export interface AssetSnapshot {
   providerStatus: ProviderStatus[];
   updatedAt: string;
 }
+
+export interface AssetCatalogItem {
+  symbol: string;
+  name: string;
+  category: string;
+  provider: string;
+  providerSymbol: string;
+  supportsStreaming: boolean;
+}
