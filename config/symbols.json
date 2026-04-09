@@ -1,0 +1,142 @@
+{
+  "crypto": [
+    {
+      "symbol": "BTC/USD",
+      "name": "Bitcoin / US Dollar",
+      "enabled": true,
+      "providers": {
+        "binance": "BTCUSDT",
+        "coinbase": "BTC-USD"
+      },
+      "streaming": {
+        "binance": true,
+        "coinbase": true
+      }
+    },
+    {
+      "symbol": "ETH/USD",
+      "name": "Ethereum / US Dollar",
+      "enabled": true,
+      "providers": {
+        "binance": "ETHUSDT",
+        "coinbase": "ETH-USD"
+      },
+      "streaming": {
+        "binance": true,
+        "coinbase": true
+      }
+    }
+  ],
+  "forex": [
+    {
+      "symbol": "EUR/USD",
+      "name": "Euro / US Dollar",
+      "enabled": true,
+      "providers": {
+        "oanda": "EUR_USD",
+        "twelvedata": "EUR/USD"
+      },
+      "streaming": {
+        "oanda": true,
+        "twelvedata": false
+      }
+    },
+    {
+      "symbol": "USD/JPY",
+      "name": "US Dollar / Japanese Yen",
+      "enabled": true,
+      "providers": {
+        "oanda": "USD_JPY",
+        "twelvedata": "USD/JPY"
+      },
+      "streaming": {
+        "oanda": true,
+        "twelvedata": false
+      }
+    }
+  ],
+  "indices": [
+    {
+      "symbol": "SPX/USD",
+      "name": "S&P 500 Index",
+      "enabled": true,
+      "providers": {
+        "twelvedata": "SPX",
+        "polygon": "I:SPX"
+      },
+      "streaming": {
+        "twelvedata": false,
+        "polygon": true
+      }
+    },
+    {
+      "symbol": "NDX/USD",
+      "name": "Nasdaq 100 Index",
+      "enabled": true,
+      "providers": {
+        "twelvedata": "NDX",
+        "polygon": "I:NDX"
+      },
+      "streaming": {
+        "twelvedata": false,
+        "polygon": true
+      }
+    }
+  ],
+  "stocks": [
+    {
+      "symbol": "AAPL/USD",
+      "name": "Apple Inc.",
+      "enabled": true,
+      "providers": {
+        "alpaca": "AAPL",
+        "polygon": "AAPL"
+      },
+      "streaming": {
+        "alpaca": true,
+        "polygon": true
+      }
+    },
+    {
+      "symbol": "NVDA/USD",
+      "name": "NVIDIA Corp.",
+      "enabled": true,
+      "providers": {
+        "alpaca": "NVDA",
+        "polygon": "NVDA"
+      },
+      "streaming": {
+        "alpaca": true,
+        "polygon": true
+      }
+    }
+  ],
+  "commodities": [
+    {
+      "symbol": "XAU/USD",
+      "name": "Gold Spot",
+      "enabled": true,
+      "providers": {
+        "oanda": "XAU_USD",
+        "twelvedata": "XAU/USD"
+      },
+      "streaming": {
+        "oanda": true,
+        "twelvedata": false
+      }
+    },
+    {
+      "symbol": "WTI/USD",
+      "name": "WTI Crude Oil",
+      "enabled": true,
+      "providers": {
+        "twelvedata": "USOIL",
+        "oanda": "BCO_USD"
+      },
+      "streaming": {
+        "twelvedata": false,
+        "oanda": true
+      }
+    }
+  ]
+}
